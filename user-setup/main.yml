@@ -1,0 +1,27 @@
+---
+- name: run the playbook tasks on the localhost
+  hosts: localhost
+  vars:
+    dotfiles_repo: "https://github.com/codingsnx/snx_dotfiles.git"
+  connection: local
+  become: yes
+  tasks:
+    - name: print out the hostname of target
+      command: hostname
+    - name: install zsh
+      ansible.builtin.apt:
+        name: zsh
+        state: latest
+    - name: install git
+      ansible.builtin.apt:
+        name: git
+        state: latest
+    - name: setup zsh
+      include_role:
+        name: setup-zsh
+    - name: setup snx dotfiles
+      include_role:
+        name: setup-dotfiles
+    - name: setup snx dotfiles
+      include_role:
+        name: setup-dotfiles

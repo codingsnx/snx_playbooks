@@ -1,0 +1,45 @@
+---
+# tasks file for setup-zsh
+
+- block:
+    - name: Check oh-my-zsh directory
+      become_user: sneax
+      stat:
+        path: '~/.oh-my-zsh'
+      register: directory_data
+
+    - debug: var=directory_data.stat.path
+
+    - name: Check oh-my-zsh autosuggestion plugin present
+      become_user: sneax
+      stat:
+        path: '~/.oh-my-zsh/custom/plugins/zsh-autosuggestions'
+      register: zsh_autosuggestion_plugin
+
+    - debug: var=zsh_autosuggestion_plugin.stat.path
+
+    - name: Check oh-my-zsh syntax-highlighting plugin present
+      become_user: sneax
+      stat:
+        path: '~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting'
+      register: zsh_syntax_highlighting_plugin
+
+    - debug: var=zsh_syntax_highlighting_plugin.stat.path
+
+    - name: run install.sh oh-my-zsh from https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+      become_user: sneax
+      shell:
+        " sh -c \"$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\" "
+      when: not zsh_autosuggestion_plugin.stat.exists
+
+    - name: run enable oh-my-zsh plugin zsh-autosuggestion
+      become_user: sneax
+      shell:
+        " git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions "
+      when: not directory_data.stat.exists
+
+    - name: run enable oh-my-zsh plugin zsh-syntax-highlighting
+      become_user: sneax
+      shell:
+       " git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions "
+      when: not zsh_syntax_highlighting_plugin.stat.exists

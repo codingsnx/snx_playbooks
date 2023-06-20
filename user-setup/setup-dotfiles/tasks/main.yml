@@ -1,0 +1,33 @@
+---
+# tasks file for setup-dotfiles
+- block:
+    - name: Check ~/gitclones directory
+      become_user: sneax
+      stat:
+        path: '~/gitclones'
+      register: gitclones_directory
+
+    - debug: var=gitclones_directory.stat.path
+
+    - name: Creates gitclones directory in ~/
+      become_user: sneax
+      file:
+        path: ~/gitclones
+        state: directory
+      when: not gitclones_directory.stat.exists
+
+    - name: Clone codingsnx dotfiles github repository
+      become_user: sneax
+      git:
+        repo: https://github.com/codingsnx/snx_dotfiles.git
+        dest: ~/gitclones/snx_dotfiles
+        clone: yes
+        update: yes
+
+    - name: copy all files in myconf/
+      copy:
+          src: "{{ item }}"
+          dest: ~/
+          force: false
+      with_fileglob:
+          - "~/gitclones/snx_dotfiles/.*rc"
