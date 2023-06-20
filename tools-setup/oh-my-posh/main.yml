@@ -1,0 +1,42 @@
+- name: install & setup oh-my-posh
+  hosts: localhost
+  connection: local
+  vars:
+    oh_my_posh_url: 'https://ohmyposh.dev/install.sh'
+  become: yes
+  tasks:
+  - name: install package dependancies with apt
+    block:
+      - name: install unzip
+        ansible.builtin.apt:
+          name: unzip
+          state: latest
+      - name: install zip 
+        ansible.builtin.apt:
+          name: zip
+          state: latest
+      - name: install git 
+        ansible.builtin.apt:
+          name: git
+          state: latest
+      - name: install zsh 
+        ansible.builtin.apt:
+          name: zsh
+          state: latest
+
+  - name: install oh my posh
+    block:
+      - name: download oh my posh install.sh
+        ansible.builtin.get_url:
+          url: "{{ oh_my_posh_url }}"
+          dest: /tmp/oh-py-posh.sh
+
+      - name: run install script
+        shell: "cat /tmp/oh-py-posh.sh | bash -s"      
+        register: "output"
+        
+      - debug: var=oh_my_posh_url
+      - debug: var=output.stdout_lines
+
+      - name: cleanup install.sh
+        file: path=/tmp/oh-py-posh.sh state=absent

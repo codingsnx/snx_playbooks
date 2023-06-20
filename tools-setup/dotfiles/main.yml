@@ -1,0 +1,24 @@
+- name: fetch & setup snx_dotfiles
+  hosts: localhost
+  connection: local
+  vars:
+    snx_dotfiles_repo: "https://github.com/codingsnx/snx_dotfiles.git"
+  become: no
+  become_user: "{{ username_running_play }}" 
+  tasks:
+  - ansible.builtin.debug:
+      msg: "Running as {{ username_running_play.stdout }}"
+
+  - name: Git checkout dotfiles
+    ansible.builtin.git:
+      repo: "{{ snx_dotfiles_repo }}"
+      dest: /tmp/snx_dotfiles
+
+  - name: "Transferring dotfiles"
+    copy:
+      src: "{{ item }}"
+      dest: ~/
+    with_fileglob: "/tmp/snx_dotfiles/.*rc"
+        
+  - name: Cleanup
+    file: path=/tmp/snx_dotfiles state=absent

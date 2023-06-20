@@ -1,0 +1,28 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: prepare setup
+      block: 
+
+      - name: get the username running the deploy
+        local_action: command whoami
+        register: username_running_play
+
+    - ansible.builtin.debug:
+        msg: run setup playbooks
+- name: oh-my-posh
+  ansible.builtin.import_playbook: oh-my-posh/main.yml
+
+- name: Set variables on an dotfiles playbook
+  ansible.builtin.import_playbook: dotfiles/main.yml
+  vars:
+    username_running_play: "{{ username_running_play.stdout }}"
+
+
+#- name: Set variables on an imported playbook
+#  ansible.builtin.import_playbook: otherplays.yml
+#  vars:
+#    service: httpd
+#
+#- name: Include a playbook from a collection
+#  ansible.builtin.import_playbook: my_namespace.my_collection.my_playbook
